@@ -16,13 +16,25 @@ namespace TeodorPopa\ImageResizer;
  */
 class ImageResizer
 {
-
+    /**
+     * Resize done to keep image proportions to the best fit
+     * The resized image may not have the exact width and height specified
+     */
     const RESIZE_TYPE_AUTO = 'auto';
 
+    /**
+     * Height is automatically calculated based on the width
+     */
     const RESIZE_TYPE_WIDTH = 'width';
 
+    /**
+     * Width is automatically calculated based on the height
+     */
     const RESIZE_TYPE_HEIGHT = 'height';
 
+    /**
+     * Image resized to the exact width and height specified
+     */
     const RESIZE_TYPE_EXACT = 'exact';
 
     /**
@@ -31,15 +43,19 @@ class ImageResizer
     private $imageFile;
 
     /**
-     * @var Resource
+     * @var resource
      */
     private $imageResource;
 
     /**
-     * @var Resource
+     * @var resource
      */
     private $resizedImageResource;
 
+    /**
+     * @param string $fileName
+     * @throws \RuntimeException
+     */
     public function __construct($fileName)
     {
         $this->imageFile = $fileName;
@@ -49,6 +65,12 @@ class ImageResizer
         $this->loadImageResource();
     }
 
+    /**
+     * Test basic settings to handle and manipulate an image
+     *
+     * @throws \RuntimeException
+     * @return bool
+     */
     protected function testSettings()
     {
         if (ini_get('allow_url_fopen') == '0') {
@@ -66,12 +88,16 @@ class ImageResizer
         return true;
     }
 
+    /**
+     * Load the image resource
+     * @throws \Exception
+     */
     protected function loadImageResource()
     {
         $imageInfo = $this->getImageInfo();
 
         if(!is_array($imageInfo) && !isset($imageInfo[2])) {
-            throw new \RuntimeException('Cannot load the image resource.');
+            throw new \Exception('Cannot load the image resource.');
         }
 
         $imageType = $imageInfo[2];
@@ -112,20 +138,36 @@ class ImageResizer
         return end(explode(".", $fileName));
     }
 
+    /**
+     * @return array
+     */
     protected function getImageInfo()
     {
         $imageInfo = getimagesize($this->imageFile);
         return $imageInfo;
     }
 
+    /**
+     * @return int
+     */
     protected function getImageWidth() {
         return imagesx($this->imageResource);
     }
 
+    /**
+     * @return int
+     */
     protected function getImageHeight() {
         return imagesy($this->imageResource);
     }
 
+    /**
+     * Calculate the image ratio
+     *
+     * @param int $width
+     * @param int $height
+     * @return string
+     */
     protected function getRatio($width = null, $height = null)
     {
         if (!empty($width) && !empty($height)) {
@@ -141,6 +183,19 @@ class ImageResizer
         return number_format(($w / $h), 2, '.', '');
     }
 
+    /**
+     * Resize the image resource
+     * $resizeType can be one of:
+     * - RESIZE_TYPE_AUTO (default)
+     * - RESIZE_TYPE_WIDTH
+     * - RESIZE_TYPE_HEIGHT
+     * - RESIZE_TYPE_EXACT
+     *
+     * @param $width
+     * @param $height
+     * @param string $resizeType
+     * @return resource
+     */
     public function resize($width, $height, $resizeType = self::RESIZE_TYPE_AUTO)
     {
         switch($resizeType) {
@@ -163,6 +218,12 @@ class ImageResizer
         return $newImageResource;
     }
 
+    /**
+     * Get the dimensions array for resizing to exact width
+     *
+     * @param int $width
+     * @return array
+     */
     protected function getResizeToWidthDimensions($width)
     {
         $ratio = $width / $this->getImageWidth();
@@ -174,6 +235,12 @@ class ImageResizer
         ];
     }
 
+    /**
+     * Get the dimensions array for resizing to exact height
+     *
+     * @param int $height
+     * @return array
+     */
     protected function getResizeToHeightDimensions($height)
     {
         $ratio = $height / $this->getImageHeight();
@@ -185,6 +252,13 @@ class ImageResizer
         ];
     }
 
+    /**
+     * Return the dimensions array for an exact resize
+     *
+     * @param int $width
+     * @param int $height
+     * @return array
+     */
     protected function getResizeExactDimensions($width, $height)
     {
         return [
@@ -193,6 +267,13 @@ class ImageResizer
         ];
     }
 
+    /**
+     * Resize an image constraining the aspect ratio of the image
+     *
+     * @param $width
+     * @param $height
+     * @return resource
+     */
     protected function resizeAuto($width, $height)
     {
         $ratio = $this->getRatio($width, $height);
@@ -210,6 +291,10 @@ class ImageResizer
         }
     }
 
+    /**
+     * @param array $dimensions
+     * @return resource
+     */
     protected function doResize($dimensions)
     {
         $newWidth = $dimensions['width'];
@@ -231,6 +316,11 @@ class ImageResizer
         return $this->resizedImageResource;
     }
 
+    /**
+     * Output image on screen
+     *
+     * @param int $imageType
+     */
     public function output($imageType = IMAGETYPE_JPEG)
     {
         switch($imageType) {
@@ -246,6 +336,13 @@ class ImageResizer
         }
     }
 
+    /**
+     * Save the file to specified location
+     *
+     * @param string $filename
+     * @param int $quality
+     * @return bool
+     */
     public function save($filename, $quality = 8)
     {
         $imageInfo = $this->getImageInfo();
