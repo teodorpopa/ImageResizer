@@ -14,6 +14,10 @@ namespace TeodorPopa\ImageResizer;
  *
  * @package TeodorPopa\ImageResizer
  */
+/**
+ * Class ImageResizer
+ * @package TeodorPopa\ImageResizer
+ */
 class ImageResizer
 {
     /**
@@ -194,28 +198,28 @@ class ImageResizer
      * @param $width
      * @param $height
      * @param string $resizeType
-     * @return resource
+     * @return ImageResizer
      */
     public function resize($width, $height, $resizeType = self::RESIZE_TYPE_AUTO)
     {
         switch($resizeType) {
             case self::RESIZE_TYPE_WIDTH:
                 $dimensions = $this->getResizeToWidthDimensions($width);
-                $newImageResource = $this->doResize($dimensions);
+                $this->doResize($dimensions);
                 break;
             case self::RESIZE_TYPE_HEIGHT:
                 $dimensions = $this->getResizeToHeightDimensions($height);
-                $newImageResource = $this->doResize($dimensions);
+                $this->doResize($dimensions);
                 break;
             case self::RESIZE_TYPE_EXACT:
                 $dimensions = $this->getResizeExactDimensions($width, $height);
-                $newImageResource = $this->doResize($dimensions);
+                $this->doResize($dimensions);
                 break;
             default:
-                $newImageResource = $this->resizeAuto($width, $height);
+                $this->resizeAuto($width, $height);
         }
 
-        return $newImageResource;
+        return $this;
     }
 
     /**
@@ -293,12 +297,12 @@ class ImageResizer
 
     /**
      * @param array $dimensions
-     * @return resource
+     * @return bool
      */
     protected function doResize($dimensions)
     {
         $newWidth = $dimensions['width'];
-        $newHeight = $dimensions['newHeight'];
+        $newHeight = $dimensions['height'];
         $newImage = imagecreatetruecolor($newWidth, $newHeight);
 
         imagealphablending($newImage, false);
@@ -313,7 +317,7 @@ class ImageResizer
         imagecopyresampled($resizedImage, $newImage, 0, 0, 0, 0, $newWidth, $newHeight, $newWidth, $newHeight);
 
         $this->resizedImageResource = $resizedImage;
-        return $this->resizedImageResource;
+        return true;
     }
 
     /**
@@ -325,15 +329,20 @@ class ImageResizer
     {
         switch($imageType) {
             case IMAGETYPE_JPEG:
+                header("Content-type: image/jpeg");
                 imagejpeg($this->resizedImageResource);
                 break;
             case IMAGETYPE_PNG:
+                header("Content-type: image/png");
                 imagepng($this->resizedImageResource);
                 break;
             case IMAGETYPE_GIF:
+                header("Content-type: image/gif");
                 imagegif($this->resizedImageResource);
                 break;
         }
+
+        exit();
     }
 
     /**
