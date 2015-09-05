@@ -1,0 +1,25 @@
+{
+  "name": "teodorpopa/image-resizer",
+  "type": "library",
+  "description": "Image library to resize images",
+  "keywords": ["image", "resize", "folder", "ratio"],
+  "homepage": "https://github.com/teodorpopa/ImageResizer",
+  "license": "GNU",
+  "authors": [
+    {
+      "name": "Teodor Popa",
+      "email": "popa.teodor@gmail.com",
+      "homepage": "http://www.teodorpopa.ro",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.0",
+    "ext-gd": "*"
+  },
+  "autoload": {
+    "psr-0": {
+      "TeodorPopa\\ImageResizer": ["src", "tests"]
+    }
+  }
+}
