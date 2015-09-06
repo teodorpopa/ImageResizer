@@ -349,7 +349,7 @@ class ImageResizer
      * Save the file to specified location
      *
      * @param string $filename
-     * @param int $quality
+     * @param int $quality 1-10
      * @return bool
      */
     public function save($filename, $quality = 8)
