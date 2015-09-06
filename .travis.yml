@@ -2,4 +2,7 @@ language: php
 rvm:
  - "master"
 
-script: cd tests && phpunit
+before_script:
+  - composer install --dev --no-interaction
+
+script: phpunit -v -c phpunit.xml

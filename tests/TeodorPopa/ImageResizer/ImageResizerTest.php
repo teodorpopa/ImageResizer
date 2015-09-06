@@ -6,14 +6,14 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
 {
     protected $images = [
         'jpg' => [
-            'vertical' => 'images/jpg_vertical.jpg',
-            'horizontal' => 'images/jpg_horizontal.jpg',
-            'exact' => 'images/jpg_exact.jpg',
+            'vertical' => 'tests/images/jpg_vertical.jpg',
+            'horizontal' => 'tests/images/jpg_horizontal.jpg',
+            'exact' => 'tests/images/jpg_exact.jpg',
         ],
         'png' => [
-            'vertical' => 'images/png_vertical.png',
-            'horizontal' => 'images/png_horizontal.png',
-            'exact' => 'images/png_exact.png',
+            'vertical' => 'tests/images/png_vertical.png',
+            'horizontal' => 'tests/images/png_horizontal.png',
+            'exact' => 'tests/images/png_exact.png',
         ],
     ];
 
@@ -59,7 +59,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testResizingAJpegImageShouldSaveTheImageOnDiskAtTheSpecifiedDimensions()
     {
-        $filename = 'images/test_jpg_vertical_exact_resize_10_100.jpg';
+        $filename = 'tests/images/test_jpg_vertical_exact_resize_10_100.jpg';
         try {
             $ImageResizer = new ImageResizer($this->images['jpg']['vertical']);
             $ImageResizer->resize(10, 100, ImageResizer::RESIZE_TYPE_EXACT)->save($filename);
@@ -80,7 +80,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testResizingAPngImageShouldSaveTheImageOnDiskAtTheSpecifiedDimensions()
     {
-        $filename = 'images/test_png_vertical_exact_resize_10_100.png';
+        $filename = 'tests/images/test_png_vertical_exact_resize_10_100.png';
         try {
             $ImageResizer = new ImageResizer($this->images['png']['vertical']);
             $ImageResizer->resize(10, 100, ImageResizer::RESIZE_TYPE_EXACT)->save($filename);
@@ -101,7 +101,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testResizingAJepgImageWithResizeTypeWidthShouldSaveTheImageToDisk()
     {
-        $filename = 'images/test_jpg_vertical_width_resize_10_x.jpg';
+        $filename = 'tests/images/test_jpg_vertical_width_resize_10_x.jpg';
         try {
             $ImageResizer = new ImageResizer($this->images['jpg']['vertical']);
             $ImageResizer->resize(10, null, ImageResizer::RESIZE_TYPE_WIDTH)->save($filename);
@@ -122,7 +122,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testResizingAJepgImageWithResizeTypeHeightShouldSaveTheImageToDisk()
     {
-        $filename = 'images/test_jpg_horizontal_height_resize_x_20.jpg';
+        $filename = 'tests/images/test_jpg_horizontal_height_resize_x_20.jpg';
         try {
             $ImageResizer = new ImageResizer($this->images['jpg']['horizontal']);
             $ImageResizer->resize(null, 20, ImageResizer::RESIZE_TYPE_HEIGHT)->save($filename);
@@ -143,7 +143,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testResizingAJepgImageWithResizeTypeExactShouldSaveTheImageToDisk()
     {
-        $filename = 'images/test_jpg_horizontal_height_resize_40_40.jpg';
+        $filename = 'tests/images/test_jpg_horizontal_height_resize_40_40.jpg';
         try {
             $ImageResizer = new ImageResizer($this->images['jpg']['horizontal']);
             $ImageResizer->resize(40, 40, ImageResizer::RESIZE_TYPE_EXACT)->save($filename);
@@ -164,7 +164,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testResizingAJepgImageWithResizeTypeAutoShouldSaveTheImageToDisk()
     {
-        $filename = 'images/test_jpg_horizontal_height_resize_40_4.jpg';
+        $filename = 'tests/images/test_jpg_horizontal_height_resize_40_4.jpg';
         try {
             $ImageResizer = new ImageResizer($this->images['jpg']['exact']);
             $ImageResizer->resize(40, 4)->save($filename);
