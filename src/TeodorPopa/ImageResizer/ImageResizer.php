@@ -327,22 +327,24 @@ class ImageResizer
      */
     public function output($imageType = IMAGETYPE_JPEG)
     {
+        $image = (empty($this->resizedImageResource)) ? $this->imageResource : $this->resizedImageResource;
+
         switch($imageType) {
             case IMAGETYPE_JPEG:
                 header("Content-type: image/jpeg");
-                imagejpeg($this->resizedImageResource);
+                imagejpeg($image);
                 break;
             case IMAGETYPE_PNG:
                 header("Content-type: image/png");
-                imagepng($this->resizedImageResource);
+                imagepng($image);
                 break;
             case IMAGETYPE_GIF:
                 header("Content-type: image/gif");
-                imagegif($this->resizedImageResource);
+                imagegif($image);
                 break;
         }
 
-        exit();
+        return true;
     }
 
     /**
