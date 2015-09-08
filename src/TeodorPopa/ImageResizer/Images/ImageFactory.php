@@ -8,7 +8,7 @@ class ImageFactory
 {
     public static function factory($filename = null, array $options = array(), $imageType = 'jpeg')
     {
-        switch($imageType) {
+        switch ($imageType) {
             case 'jpeg':
                 return new Jpeg($filename, $options);
             case 'png':

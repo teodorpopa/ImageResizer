@@ -4,11 +4,7 @@ namespace TeodorPopa\ImageResizer\Processors;
 
 use TeodorPopa\ImageResizer\Exceptions\ProcessorException;
 use TeodorPopa\ImageResizer\ImageResizer;
-use TeodorPopa\ImageResizer\Images\Gif;
-use TeodorPopa\ImageResizer\Images\Image;
 use TeodorPopa\ImageResizer\Images\ImageFactory;
-use TeodorPopa\ImageResizer\Images\Jpeg;
-use TeodorPopa\ImageResizer\Images\Png;
 
 abstract class AbstractProcessor
 {
@@ -76,12 +72,12 @@ abstract class AbstractProcessor
     {
         $resource = null;
 
-        if(empty($filename)) {
+        if (empty($filename)) {
             $resource = ImageFactory::factory(null, ['width' => 1, 'height' => 1], 'image');
         } else {
             $imageType = $this->getImageMimeType($filename);
 
-            switch($imageType) {
+            switch ($imageType) {
                 case IMAGETYPE_JPEG:
                     $resource = ImageFactory::factory($filename, [], 'jpeg');
                     break;
@@ -96,7 +92,7 @@ abstract class AbstractProcessor
             }
         }
 
-        if(empty($resource)) {
+        if (empty($resource)) {
             throw new ProcessorException('There was a problem loading the image');
         }
 
@@ -110,7 +106,7 @@ abstract class AbstractProcessor
      *
      * @param int $width
      * @param int $height
-     * @return float
+     * @return string
      */
     protected function getRatio($width = null, $height = null)
     {

@@ -36,7 +36,7 @@ class ImageResizer
     /**
      * Middle position on the Y axis
      */
-    const RESIZE_POSITION_MIDDLE= 'middle';
+    const RESIZE_POSITION_MIDDLE = 'middle';
 
     /**
      * Bottom position on the Y axis
@@ -46,12 +46,12 @@ class ImageResizer
     /**
      * Left position on the X axis
      */
-    const RESIZE_POSITION_LEFT= 'left';
+    const RESIZE_POSITION_LEFT = 'left';
 
     /**
      * Center position on the X axis
      */
-    const RESIZE_POSITION_CENTER= 'center';
+    const RESIZE_POSITION_CENTER = 'center';
 
     /**
      * Right position on the X axis

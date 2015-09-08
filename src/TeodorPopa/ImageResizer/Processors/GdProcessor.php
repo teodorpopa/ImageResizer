@@ -12,7 +12,7 @@ class GdProcessor extends AbstractProcessor implements Processor
     {
         $this->setOptions($options);
 
-        switch($this->resizeType) {
+        switch ($this->resizeType) {
             case ImageResizer::RESIZE_TYPE_WIDTH:
                 $dimensions = $this->getResizeToWidthDimensions($width);
                 $this->doResize($width = null, $height = null, $dimensions);
@@ -103,7 +103,7 @@ class GdProcessor extends AbstractProcessor implements Processor
         $ratio = $this->getRatio($width, $height);
         $originalRatio = $this->getRatio($this->getImageWidth($this->loadedImage), $this->getImageHeight($this->loadedImage));
 
-        switch($ratio) {
+        switch ($ratio) {
             case ($ratio < $originalRatio):
                 return $this->resize($width, $height, self::RESIZE_TYPE_WIDTH);
                 break;
@@ -179,7 +179,7 @@ class GdProcessor extends AbstractProcessor implements Processor
 
         $imageInfo = getimagesize($filename);
 
-        if(is_array($imageInfo) && isset($imageInfo[2])) {
+        if (is_array($imageInfo) && isset($imageInfo[2])) {
             return $imageInfo[2];
         }
 
