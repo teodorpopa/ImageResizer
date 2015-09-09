@@ -22,15 +22,15 @@ class GdProcessor extends AbstractProcessor implements Processor
         switch ($this->resizeType) {
             case ImageResizer::RESIZE_TYPE_WIDTH:
                 $dimensions = $this->getResizeToWidthDimensions($width);
-                $this->doResize($width = null, $height = null, $dimensions);
+                $this->doResize($width, $height, $dimensions);
                 break;
             case ImageResizer::RESIZE_TYPE_HEIGHT:
                 $dimensions = $this->getResizeToHeightDimensions($height);
-                $this->doResize($width = null, $height = null, $dimensions);
+                $this->doResize($width, $height, $dimensions);
                 break;
             case ImageResizer::RESIZE_TYPE_EXACT:
                 $dimensions = $this->getResizeExactDimensions($width, $height);
-                $this->doResize($width = null, $height = null, $dimensions);
+                $this->doResize($width, $height, $dimensions);
                 break;
             default:
                 $this->resizeAuto($width, $height);
@@ -148,11 +148,11 @@ class GdProcessor extends AbstractProcessor implements Processor
 
         switch ($ratio) {
             case ($ratio < $originalRatio):
-                return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_WIDTH);
+                return $this->resize($width, $height, ['resizeType' => ImageResizer::RESIZE_TYPE_WIDTH]);
             case ($ratio > $originalRatio):
-                return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_HEIGHT);
+                return $this->resize($width, $height, ['resizeType' => ImageResizer::RESIZE_TYPE_HEIGHT]);
             default:
-                return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_EXACT);
+                return $this->resize($width, $height, ['resizeType' => ImageResizer::RESIZE_TYPE_EXACT]);
         }
     }
 
@@ -172,17 +172,14 @@ class GdProcessor extends AbstractProcessor implements Processor
         list($red, $green, $blue) = $this->extractBackgroundColor();
 
         $background = imagecolorallocate($newImage, $red, $green, $blue);
-        imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $background);
+        imagefilledrectangle($newImage, 0, 0, $width, $height, $background);
 
         $left = $this->getAxisOffset($width, $newWidth);
         $top = $this->getAxisOffset($height, $newHeight);
 
-        imagecopyresampled($newImage, $this->loadedImage, $left, $top, 0, 0, $width, $height, $this->getImageSize($this->loadedImage), $this->getImageSize($this->loadedImage, 'height'));
+        imagecopyresampled($newImage, $this->loadedImage, $left, $top, 0, 0, $newWidth, $newHeight, $this->getImageSize($this->loadedImage), $this->getImageSize($this->loadedImage, 'height'));
 
-        $resizedImage = ImageFactory::factory(null, ['width' => $newWidth, 'height' => $newHeight], 'image');
-        imagecopyresampled($resizedImage, $newImage, 0, 0, 0, 0, $newWidth, $newHeight, $newWidth, $newHeight);
-
-        $this->processedImage = $resizedImage;
+        $this->processedImage = $newImage;
         return true;
     }
 
@@ -194,10 +191,10 @@ class GdProcessor extends AbstractProcessor implements Processor
     {
         if (is_array($this->background) && count($this->background) == 3) {
             $background = $this->extractRgbColor($this->background);
-        } else if (is_string($this->background)) {
-            $background = $this->extractHexColor($this->background);
         } else if ($this->background == ImageResizer::BACKGROUND_COLOR_AUTO) {
             $background = $this->extractAutoBackgroundColor();
+        } else if (is_string($this->background)) {
+            $background = $this->extractHexColor($this->background);
         } else {
             throw new ProcessorException('Invalid background color');
         }
@@ -235,7 +232,11 @@ class GdProcessor extends AbstractProcessor implements Processor
         $thisColor = imagecolorat($this->loadedImage, 0, 0);
         $colorInfo = imagecolorsforindex($this->loadedImage, $thisColor);
 
-        return array_slice($colorInfo, 0, 3);
+        return [
+            $colorInfo['red'],
+            $colorInfo['green'],
+            $colorInfo['blue']
+        ];
     }
 
     /**
@@ -253,14 +254,17 @@ class GdProcessor extends AbstractProcessor implements Processor
         }
 
         switch ($this->resizePositionX) {
-            case ImageResizer::RESIZE_POSITION_LEFT || ImageResizer::RESIZE_POSITION_TOP:
+            case ImageResizer::RESIZE_POSITION_LEFT:
+            case ImageResizer::RESIZE_POSITION_TOP:
                 $offset = 0;
                 break;
-            case ImageResizer::RESIZE_POSITION_CENTER || ImageResizer::RESIZE_POSITION_MIDDLE:
-                $offset = ($big - $small) / 2;
+            case ImageResizer::RESIZE_POSITION_CENTER:
+            case ImageResizer::RESIZE_POSITION_MIDDLE:
+                $offset = ($diff) / 2;
                 break;
-            case ImageResizer::RESIZE_POSITION_RIGHT || ImageResizer::RESIZE_POSITION_BOTTOM:
-                $offset = $big - $small;
+            case ImageResizer::RESIZE_POSITION_RIGHT:
+            case ImageResizer::RESIZE_POSITION_BOTTOM:
+                $offset = $diff;
                 break;
         }
 

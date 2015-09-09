@@ -22,7 +22,7 @@ interface Processor
     /**
      * @param resource $imageResource
      * @param string $size
-     * @return int
+     * @return mixed
      */
     public function getImageSize($imageResource, $size = 'width');
 

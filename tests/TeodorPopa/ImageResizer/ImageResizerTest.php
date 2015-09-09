@@ -2,6 +2,8 @@
 
 namespace TeodorPopa\ImageResizer;
 
+use TeodorPopa\ImageResizer\Exceptions\ProcessorException;
+
 class ImageResizerTest extends \PHPUnit_Framework_TestCase
 {
     protected $images = [
@@ -19,9 +21,9 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        foreach (glob("images/test_*") as $filename) {
-            @unlink($filename);
-        }
+//        foreach (glob("images/test_*") as $filename) {
+//            @unlink($filename);
+//        }
     }
 
     /**
@@ -30,10 +32,10 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     public function testWhenTryingToLoadAnInexistentImageThrowException()
     {
         try {
-            $ImageResizer = new ImageResizer('__NON_EXISTENT_IMAGE__.jpg');
+            $ImageResizer = ImageResizer::load('__NON_EXISTENT_IMAGE__.jpg');
 
             $this->fail('When sending an invalid image file should throw a RuntimeException');
-        } catch(\RuntimeException $e) {
+        } catch(ProcessorException $e) {
             $this->assertEquals('The specified image does not exist.', $e->getMessage());
         }
     }
@@ -46,11 +48,11 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
         try {
             foreach($this->images as $imageType) {
                 foreach($imageType as $image) {
-                    $ImageResizer = new ImageResizer($image);
+                    $ImageResizer = ImageResizer::load($image);
                 }
             }
         } catch(\Exception $e) {
-            $this->fail('Should not fail if all images exist on disk');
+            $this->fail('Should not fail if all images exist on disk: ' . $e->getMessage());
         }
     }
 
@@ -61,8 +63,9 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     {
         $filename = 'tests/images/test_jpg_vertical_exact_resize_10_100.jpg';
         try {
-            $ImageResizer = new ImageResizer($this->images['jpg']['vertical']);
-            $ImageResizer->resize(10, 100, ImageResizer::RESIZE_TYPE_EXACT)->save($filename);
+            $ImageResizer = ImageResizer::load($this->images['jpg']['vertical'])->resize(10, 100, [
+                'resizeType' => ImageResizer::RESIZE_TYPE_EXACT
+            ])->save($filename);
 
             $this->assertFileExists($filename);
 
@@ -82,8 +85,9 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     {
         $filename = 'tests/images/test_png_vertical_exact_resize_10_100.png';
         try {
-            $ImageResizer = new ImageResizer($this->images['png']['vertical']);
-            $ImageResizer->resize(10, 100, ImageResizer::RESIZE_TYPE_EXACT)->save($filename);
+            $ImageResizer = ImageResizer::load($this->images['png']['vertical'])->resize(10, 100, [
+                'resizeType' => ImageResizer::RESIZE_TYPE_EXACT
+            ])->save($filename);
 
             $this->assertFileExists($filename);
 
@@ -97,20 +101,21 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * resizing a jepg image with resize type width should save the image to disk
+     * resizing a jpeg image with resize type width should save the image to disk
      */
-    public function testResizingAJepgImageWithResizeTypeWidthShouldSaveTheImageToDisk()
+    public function testResizingAJpegImageWithResizeTypeWidthShouldSaveTheImageToDisk()
     {
         $filename = 'tests/images/test_jpg_vertical_width_resize_10_x.jpg';
         try {
-            $ImageResizer = new ImageResizer($this->images['jpg']['vertical']);
-            $ImageResizer->resize(10, null, ImageResizer::RESIZE_TYPE_WIDTH)->save($filename);
+            $ImageResizer = ImageResizer::load($this->images['jpg']['vertical'])->resize(10, 1, [
+                'resizeType' => ImageResizer::RESIZE_TYPE_WIDTH
+            ])->save($filename);
 
             $this->assertFileExists($filename);
 
             $fileInfo = getimagesize($filename);
             $this->assertEquals(10, $fileInfo[0]);
-            $this->assertEquals(166, $fileInfo[1]);
+            $this->assertEquals(1, $fileInfo[1]);
 
         } catch(\Exception $e) {
             $this->fail('Should not fail if resize is done correctly: ' . $e->getMessage());
@@ -118,19 +123,20 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * resizing a jepg image with resize type height should save the image to disk
+     * resizing a jpeg image with resize type height should save the image to disk
      */
-    public function testResizingAJepgImageWithResizeTypeHeightShouldSaveTheImageToDisk()
+    public function testResizingAJpegImageWithResizeTypeHeightShouldSaveTheImageToDisk()
     {
         $filename = 'tests/images/test_jpg_horizontal_height_resize_x_20.jpg';
         try {
-            $ImageResizer = new ImageResizer($this->images['jpg']['horizontal']);
-            $ImageResizer->resize(null, 20, ImageResizer::RESIZE_TYPE_HEIGHT)->save($filename);
+            $ImageResizer = ImageResizer::load($this->images['jpg']['horizontal'])->resize(1, 20, [
+                'resizeType' => ImageResizer::RESIZE_TYPE_HEIGHT
+            ])->save($filename);
 
             $this->assertFileExists($filename);
 
             $fileInfo = getimagesize($filename);
-            $this->assertEquals(333, $fileInfo[0]);
+            $this->assertEquals(1, $fileInfo[0]);
             $this->assertEquals(20, $fileInfo[1]);
 
         } catch(\Exception $e) {
@@ -139,14 +145,15 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * resizing a jepg image with resize type exact should save the image to disk
+     * resizing a jpeg image with resize type exact should save the image to disk
      */
-    public function testResizingAJepgImageWithResizeTypeExactShouldSaveTheImageToDisk()
+    public function testResizingAJpegImageWithResizeTypeExactShouldSaveTheImageToDisk()
     {
         $filename = 'tests/images/test_jpg_horizontal_height_resize_40_40.jpg';
         try {
-            $ImageResizer = new ImageResizer($this->images['jpg']['horizontal']);
-            $ImageResizer->resize(40, 40, ImageResizer::RESIZE_TYPE_EXACT)->save($filename);
+            $ImageResizer = ImageResizer::load($this->images['jpg']['horizontal'])->resize(40, 40, [
+                'resizeType' => ImageResizer::RESIZE_TYPE_EXACT
+            ])->save($filename);
 
             $this->assertFileExists($filename);
 
@@ -160,20 +167,85 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * resizing a jepg image with resize type auto should save the image to disk
+     * resizing a jpeg image with resize type auto should save the image to disk
      */
-    public function testResizingAJepgImageWithResizeTypeAutoShouldSaveTheImageToDisk()
+    public function testResizingAJpegImageWithResizeTypeAutoShouldSaveTheImageToDisk()
     {
-        $filename = 'tests/images/test_jpg_horizontal_height_resize_40_4.jpg';
+        $filename = 'tests/images/test_jpg_horizontal_height_resize_10_15.jpg';
         try {
-            $ImageResizer = new ImageResizer($this->images['jpg']['exact']);
-            $ImageResizer->resize(40, 4)->save($filename);
+            $ImageResizer = ImageResizer::load($this->images['jpg']['exact'])->resize(10, 15)->save($filename);
 
             $this->assertFileExists($filename);
 
             $fileInfo = getimagesize($filename);
-            $this->assertEquals(4, $fileInfo[0]);
-            $this->assertEquals(4, $fileInfo[1]);
+            $this->assertEquals(10, $fileInfo[0]);
+            $this->assertEquals(15, $fileInfo[1]);
+
+        } catch(\Exception $e) {
+            $this->fail('Should not fail if resize is done correctly: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * resizing a jpeg image with resize type auto and background color hex should save the image to disk
+     */
+    public function testResizingAJpegImageWithResizeTypeAutoAndBackgroundColorHexShouldSaveTheImageToDisk()
+    {
+        $filename = 'tests/images/test_jpg_horizontal_height_resize_10_15_black.jpg';
+        try {
+            $ImageResizer = ImageResizer::load($this->images['jpg']['exact'])->resize(10, 15, [
+                'background' => '#000000'
+            ])->save($filename);
+
+            $this->assertFileExists($filename);
+
+            $fileInfo = getimagesize($filename);
+            $this->assertEquals(10, $fileInfo[0]);
+            $this->assertEquals(15, $fileInfo[1]);
+
+        } catch(\Exception $e) {
+            $this->fail('Should not fail if resize is done correctly: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * resizing a jpeg image with resize type auto and background color rgb should save the image to disk
+     */
+    public function testResizingAJpegImageWithResizeTypeAutoAndBackgroundColorRgbShouldSaveTheImageToDisk()
+    {
+        $filename = 'tests/images/test_jpg_horizontal_height_resize_10_15_red.jpg';
+        try {
+            $ImageResizer = ImageResizer::load($this->images['jpg']['exact'])->resize(10, 15, [
+                'background' => [255, 0, 0]
+            ])->save($filename);
+
+            $this->assertFileExists($filename);
+
+            $fileInfo = getimagesize($filename);
+            $this->assertEquals(10, $fileInfo[0]);
+            $this->assertEquals(15, $fileInfo[1]);
+
+        } catch(\Exception $e) {
+            $this->fail('Should not fail if resize is done correctly: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * resizing a jpeg image with resize type auto and background color auto should save the image to disk
+     */
+    public function testResizingAJpegImageWithResizeTypeAutoAndBackgroundColorAutoShouldSaveTheImageToDisk()
+    {
+        $filename = 'tests/images/test_jpg_horizontal_height_resize_10_15_auto.jpg';
+        try {
+            $ImageResizer = ImageResizer::load($this->images['jpg']['exact'])->resize(10, 15, [
+                'background' => ImageResizer::BACKGROUND_COLOR_AUTO
+            ])->save($filename);
+
+            $this->assertFileExists($filename);
+
+            $fileInfo = getimagesize($filename);
+            $this->assertEquals(10, $fileInfo[0]);
+            $this->assertEquals(15, $fileInfo[1]);
 
         } catch(\Exception $e) {
             $this->fail('Should not fail if resize is done correctly: ' . $e->getMessage());

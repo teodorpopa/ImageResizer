@@ -12,8 +12,6 @@ class Png extends BaseImage implements ImageInterface
      */
     public function __construct($filename = null, $options = array())
     {
-        parent::__construct();
-
         $resource = imagecreatefrompng($filename);
 
         imagealphablending($resource, false);
