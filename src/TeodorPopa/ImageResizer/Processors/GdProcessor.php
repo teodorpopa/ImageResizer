@@ -94,8 +94,8 @@ class GdProcessor extends AbstractProcessor implements Processor
      */
     protected function getResizeToWidthDimensions($width)
     {
-        $ratio = $width / $this->getImageWidth($this->loadedImage);
-        $height = $this->getImageHeight($this->loadedImage) * $ratio;
+        $ratio = $width / $this->getImageSize($this->loadedImage);
+        $height = $this->getImageSize($this->loadedImage, 'height') * $ratio;
 
         return [
             'width' => $width,
@@ -111,8 +111,8 @@ class GdProcessor extends AbstractProcessor implements Processor
      */
     protected function getResizeToHeightDimensions($height)
     {
-        $ratio = $height / $this->getImageHeight($this->loadedImage);
-        $width = $this->getImageWidth($this->loadedImage) * $ratio;
+        $ratio = $height / $this->getImageSize($this->loadedImage, 'height');
+        $width = $this->getImageSize($this->loadedImage) * $ratio;
 
         return [
             'width' => $width,
@@ -145,7 +145,7 @@ class GdProcessor extends AbstractProcessor implements Processor
     protected function resizeAuto($width, $height)
     {
         $ratio = $this->getRatio($width, $height);
-        $originalRatio = $this->getRatio($this->getImageWidth($this->loadedImage), $this->getImageHeight($this->loadedImage));
+        $originalRatio = $this->getRatio($this->getImagesize($this->loadedImage), $this->getImageSize($this->loadedImage, 'height'));
 
         switch ($ratio) {
             case ($ratio < $originalRatio):
@@ -178,7 +178,7 @@ class GdProcessor extends AbstractProcessor implements Processor
         $left = $this->getAxisOffset($width, $newWidth);
         $top = $this->getAxisOffset($height, $newHeight);
 
-        imagecopyresampled($newImage, $this->loadedImage, $left, $top, 0, 0, $width, $height, $this->getImageWidth($this->loadedImage), $this->getImageHeight($this->loadedImage));
+        imagecopyresampled($newImage, $this->loadedImage, $left, $top, 0, 0, $width, $height, $this->getImageSize($this->loadedImage), $this->getImageSize($this->loadedImage, 'height'));
 
         $resizedImage = ImageFactory::factory(null, ['width' => $newWidth, 'height' => $newHeight], 'image');
         imagecopyresampled($resizedImage, $newImage, 0, 0, 0, 0, $newWidth, $newHeight, $newWidth, $newHeight);
@@ -289,17 +289,15 @@ class GdProcessor extends AbstractProcessor implements Processor
 
     /**
      * @param resource $imageResource
+     * @param string $size
      * @return int
      */
-    public function getImageWidth($imageResource) {
-        return imagesx($imageResource);
+    public function getImageSize($imageResource, $size = 'width') {
+        if($size == 'width') {
+            return imagesx($imageResource);
+        } else {
+            return imagesy($imageResource);
+        }
     }
 
-    /**
-     * @param resource $imageResource
-     * @return int
-     */
-    public function getImageHeight($imageResource) {
-        return imagesy($imageResource);
-    }
 }

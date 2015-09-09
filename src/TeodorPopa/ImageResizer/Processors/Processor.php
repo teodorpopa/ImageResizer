@@ -21,14 +21,9 @@ interface Processor
 
     /**
      * @param resource $imageResource
+     * @param string $size
      * @return int
      */
-    public function getImageWidth($imageResource);
-
-    /**
-     * @param resource $imageResource
-     * @return int
-     */
-    public function getImageHeight($imageResource);
+    public function getImageSize($imageResource, $size = 'width');
 
 }
