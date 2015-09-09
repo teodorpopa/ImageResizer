@@ -21,9 +21,9 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-//        foreach (glob("images/test_*") as $filename) {
-//            @unlink($filename);
-//        }
+        foreach (glob("images/test_*") as $filename) {
+            @unlink($filename);
+        }
     }
 
     /**
