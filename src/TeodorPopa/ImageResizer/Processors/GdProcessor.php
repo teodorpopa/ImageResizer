@@ -175,8 +175,8 @@ class GdProcessor extends AbstractProcessor implements Processor
         $background = imagecolorallocate($newImage, $red, $green, $blue);
         imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $background);
 
-        $left = $this->getXAxisOffset($width, $newWidth);
-        $top = $this->getYAxisOffset($height, $newHeight);
+        $left = $this->getAxisOffset($width, $newWidth);
+        $top = $this->getAxisOffset($height, $newHeight);
 
         imagecopyresampled(
             $newImage,
@@ -256,61 +256,32 @@ class GdProcessor extends AbstractProcessor implements Processor
     }
 
     /**
-     * @param $width
-     * @param $newWidth
+     * @param $big
+     * @param $small
      * @return int
      */
-    protected function getXAxisOffset($width, $newWidth)
+    protected function getAxisOffset($big, $small)
     {
-        $diff = $width - $newWidth;
-        $xOffset = 0;
+        $diff = $big - $small;
+        $offset = 0;
 
         if ($diff <= 0) {
-            return $xOffset;
+            return $offset;
         }
 
         switch ($this->resizePositionX) {
-            case ImageResizer::RESIZE_POSITION_LEFT:
-                $xOffset = 0;
+            case ImageResizer::RESIZE_POSITION_LEFT || ImageResizer::RESIZE_POSITION_TOP:
+                $offset = 0;
                 break;
-            case ImageResizer::RESIZE_POSITION_CENTER:
-                $xOffset = ($width - $newWidth) / 2;
+            case ImageResizer::RESIZE_POSITION_CENTER || ImageResizer::RESIZE_POSITION_MIDDLE:
+                $offset = ($big - $small) / 2;
                 break;
-            case ImageResizer::RESIZE_POSITION_RIGHT:
-                $xOffset = $width - $newWidth;
-                break;
-        }
-
-        return (int)$xOffset;
-    }
-
-    /**
-     * @param $height
-     * @param $newHeight
-     * @return int
-     */
-    protected function getYAxisOffset($height, $newHeight)
-    {
-        $diff = $height - $newHeight;
-        $yOffset = 0;
-
-        if ($diff <= 0) {
-            return $yOffset;
-        }
-
-        switch ($this->resizePositionX) {
-            case ImageResizer::RESIZE_POSITION_TOP:
-                $yOffset = 0;
-                break;
-            case ImageResizer::RESIZE_POSITION_MIDDLE:
-                $yOffset = ($height - $newHeight) / 2;
-                break;
-            case ImageResizer::RESIZE_POSITION_BOTTOM:
-                $yOffset = $height - $newHeight;
+            case ImageResizer::RESIZE_POSITION_RIGHT || ImageResizer::RESIZE_POSITION_BOTTOM:
+                $offset = $big - $small;
                 break;
         }
 
-        return (int)$yOffset;
+        return (int)$offset;
     }
 
     /**
