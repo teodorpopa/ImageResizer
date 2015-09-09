@@ -228,18 +228,15 @@ class GdProcessor extends AbstractProcessor implements Processor
 
     /**
      * Extract the color from the top left corner of the image
-     * 
+     *
      * @return array
      */
     protected function extractAutoBackgroundColor()
     {
         $thisColor = imagecolorat($this->loadedImage, 0, 0);
+        $colorInfo = imagecolorsforindex($this->loadedImage, $thisColor);
 
-        $red = ($thisColor >> 16) & 0xFF;
-        $green = ($thisColor >> 8) & 0xFF;
-        $blue = $thisColor & 0xFF;
-
-        return [$red, $green, $blue];
+        return array_slice($colorInfo, 0, 3);
     }
 
     /**
