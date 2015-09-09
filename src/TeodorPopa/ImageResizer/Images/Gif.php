@@ -4,31 +4,18 @@ namespace TeodorPopa\ImageResizer\Images;
 
 use TeodorPopa\ImageResizer\Exceptions\SetupException;
 
-class Gif implements ImageInterface
+class Gif extends BaseImage implements ImageInterface
 {
 
     public function __construct($filename = null, $options = array())
     {
-        if (!file_exists($filename)) {
-            throw new SetupException('The specified image does not exist.');
-        }
+        parent::__construct();
 
         $resource = imagecreatefromgif($filename);
 
-        return $resource;
+        $this->imageResource = $resource;
+
+        return $this;
     }
 
-    public function output($image)
-    {
-        header("Content-type: image/gif");
-
-        imagegif($image);
-    }
-
-    public function save($resource = null, $filename = null, $quality = 10)
-    {
-        imagegif($resource, $filename);
-
-        return true;
-    }
 }

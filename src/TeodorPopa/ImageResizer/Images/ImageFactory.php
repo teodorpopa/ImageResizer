@@ -6,20 +6,35 @@ use TeodorPopa\ImageResizer\Exceptions\ProcessorException;
 
 class ImageFactory
 {
+    /**
+     * Image factory
+     *
+     * @param null $filename
+     * @param array $options
+     * @param string $imageType
+     * @return resource
+     * @throws ProcessorException
+     */
     public static function factory($filename = null, array $options = array(), $imageType = 'jpeg')
     {
         switch ($imageType) {
             case 'jpeg':
-                return new Jpeg($filename, $options);
+                $image = new Jpeg($filename, $options);
+                break;
             case 'png':
-                return new Png($filename, $options);
+                $image = new Png($filename, $options);
+                break;
             case 'gif':
-                return new Gif($filename, $options);
+                $image = new Gif($filename, $options);
+                break;
             case 'image':
-                return new Image(null, $options);
+                $image = new Image(null, $options);
+                break;
             default:
                 throw new ProcessorException('There was an error trying to create the image resource.');
         }
+
+        return $image->getResource();
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace TeodorPopa\ImageResizer;
 
+use TeodorPopa\ImageResizer\Processors\GdProcessor;
 use TeodorPopa\ImageResizer\Exceptions\SetupException;
 
 class ImageResizer
@@ -58,15 +59,25 @@ class ImageResizer
      */
     const RESIZE_POSITION_RIGHT = 'right';
 
+    /**
+     * Auto extract the background color to fill the image
+     */
+    const BACKGROUND_COLOR_AUTO = 'background-auto';
 
-
+    /**
+     * Load an image into the processor
+     *
+     * @param string $filename
+     * @return GdProcessor
+     * @throws SetupException
+     */
     public static function load($filename = null)
     {
         if (extension_loaded('gd')) {
             return new GdProcessor($filename);
         }
 
-        throw new SetupExceptionception('To run this you need GD extensions to be installed.');
+        throw new SetupException('To run this you need GD extensions to be installed.');
     }
 
 }

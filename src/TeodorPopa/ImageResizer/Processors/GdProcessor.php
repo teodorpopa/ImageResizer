@@ -2,12 +2,20 @@
 
 namespace TeodorPopa\ImageResizer\Processors;
 
+use TeodorPopa\ImageResizer\Exceptions\ProcessorException;
 use TeodorPopa\ImageResizer\ImageResizer;
+use TeodorPopa\ImageResizer\Images\Image;
 use TeodorPopa\ImageResizer\Images\ImageFactory;
 
 class GdProcessor extends AbstractProcessor implements Processor
 {
 
+    /**
+     * @param int $width
+     * @param int $height
+     * @param array $options
+     * @return $this
+     */
     public function resize($width = null, $height = null, array $options = array())
     {
         $this->setOptions($options);
@@ -32,14 +40,50 @@ class GdProcessor extends AbstractProcessor implements Processor
         return $this;
     }
 
-    public function output()
+    /**
+     * Output an image to a valid IMAGETYPE_XXX type
+     * @param int $fileType
+     */
+    public function output($fileType = IMAGETYPE_JPEG)
     {
-
+        switch($fileType) {
+            case IMAGETYPE_JPEG:
+                header("Content-type: image/jpeg");
+                imagejpeg($this->processedImage);
+                break;
+            case IMAGETYPE_PNG:
+                header("Content-type: image/png");
+                imagepng($this->processedImage);
+                break;
+            case IMAGETYPE_GIF:
+                header("Content-type: image/gif");
+                imagegif($this->processedImage);
+                break;
+        }
     }
 
-    public function save($filename = null, $quality = 10)
+    /**
+     * Saves an image to the specified filename
+     *
+     * @param null $filename
+     * @param int $quality
+     * @param int $fileType
+     */
+    public function save($filename = null, $quality = 10, $fileType = IMAGETYPE_JPEG)
     {
-
+        switch($fileType) {
+            case IMAGETYPE_JPEG:
+                $compression = $quality * 10;
+                imagejpeg($this->processedImage, $filename, $compression);
+                break;
+            case IMAGETYPE_PNG:
+                $quality--;
+                imagepng($this->processedImage, $filename, $quality);
+                break;
+            case IMAGETYPE_GIF:
+                imagegif($this->processedImage, $filename);
+                break;
+        }
     }
 
     /**
@@ -105,33 +149,39 @@ class GdProcessor extends AbstractProcessor implements Processor
 
         switch ($ratio) {
             case ($ratio < $originalRatio):
-                return $this->resize($width, $height, self::RESIZE_TYPE_WIDTH);
+                return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_WIDTH);
                 break;
             case ($ratio > $originalRatio):
-                return $this->resize($width, $height, self::RESIZE_TYPE_HEIGHT);
+                return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_HEIGHT);
                 break;
             default:
-                return $this->resize($width, $height, self::RESIZE_TYPE_EXACT);
+                return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_EXACT);
                 break;
         }
     }
 
     /**
+     * @param int $width
+     * @param int $height
      * @param array $dimensions
      * @return bool
+     * @throws ProcessorException
      */
     protected function doResize($width = null, $height = null, $dimensions)
     {
         $newWidth = $dimensions['width'];
         $newHeight = $dimensions['height'];
 
-        $left = (($width - $newWidth) != 0) ? (($width - $newWidth) / 2) : 0;
-        $top = (($height - $newHeight) != 0) ? (($height - $newHeight) / 2) : 0;
-
         $newImage = ImageFactory::factory(null, ['width' => $width, 'height' => $height], 'image');
 
-        $background = imagecolorallocate($newImage, 255, 255, 255);
+        $backgroundColor = $this->extractBackgroundColor();
+        list($red, $green, $blue) = $backgroundColor;
+
+        $background = imagecolorallocate($newImage, $red, $green, $blue);
         imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $background);
+
+        $left = $this->getXAxisOffset($width, $newWidth);
+        $top = $this->getYAxisOffset($height, $newHeight);
 
         imagecopyresampled(
             $newImage,
@@ -166,6 +216,105 @@ class GdProcessor extends AbstractProcessor implements Processor
         return true;
     }
 
+    /**
+     * @return string|array
+     * @throws ProcessorException
+     */
+    protected function extractBackgroundColor()
+    {
+        if (is_array($this->background) && count($this->background) == 3) {
+            $background = $this->extractRgbColor($this->background);
+        } else if (is_string($this->background)) {
+            $background = $this->extractHexColor($this->background);
+        } else if ($this->background == ImageResizer::BACKGROUND_COLOR_AUTO) {
+            $background = $this->extractAutoBackgroundColor();
+        } else {
+            throw new ProcessorException('Invalid background color');
+        }
+
+        return $background;
+    }
+
+    /**
+     * @param $colorArray
+     * @return array
+     */
+    protected function extractRgbColor($colorArray)
+    {
+        return $colorArray;
+    }
+
+    /**
+     * @param string $backgroundColor
+     * @return array
+     */
+    protected function extractHexColor($backgroundColor)
+    {
+        $color = ltrim($backgroundColor, '#');
+
+        return (strlen($backgroundColor) == 3) ? sscanf($color, "%1x%1x%1x") : sscanf($color, "%02x%02x%02x");
+    }
+
+    protected function extractAutoBackgroundColor()
+    {
+        return true;
+    }
+
+    /**
+     * @param $width
+     * @param $newWidth
+     * @return int
+     */
+    protected function getXAxisOffset($width, $newWidth)
+    {
+        $diff = $width - $newWidth;
+
+        if ($diff <= 0) {
+            return 0;
+        }
+
+        switch ($this->resizePositionX) {
+            case ImageResizer::RESIZE_POSITION_LEFT:
+                $xOffset = 0;
+                break;
+            case ImageResizer::RESIZE_POSITION_CENTER:
+                $xOffset = ($width - $newWidth) / 2;
+                break;
+            case ImageResizer::RESIZE_POSITION_RIGHT:
+                $xOffset = $width - $newWidth;
+                break;
+        }
+
+        return (int)$xOffset;
+    }
+
+    /**
+     * @param $height
+     * @param $newHeight
+     * @return int
+     */
+    protected function getYAxisOffset($height, $newHeight)
+    {
+        $diff = $height - $newHeight;
+
+        if ($diff <= 0) {
+            return 0;
+        }
+
+        switch ($this->resizePositionX) {
+            case ImageResizer::RESIZE_POSITION_TOP:
+                $yOffset = 0;
+                break;
+            case ImageResizer::RESIZE_POSITION_MIDDLE:
+                $yOffset = ($height - $newHeight) / 2;
+                break;
+            case ImageResizer::RESIZE_POSITION_BOTTOM:
+                $yOffset = $height - $newHeight;
+                break;
+        }
+
+        return (int)$yOffset;
+    }
 
     /**
      * @param string $filename

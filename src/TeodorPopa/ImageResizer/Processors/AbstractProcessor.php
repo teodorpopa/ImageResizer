@@ -38,7 +38,10 @@ abstract class AbstractProcessor
      */
     protected $processedImage;
 
-
+    /**
+     * @param string $filename
+     * @throws ProcessorException
+     */
     public function __construct($filename = null)
     {
         if (!file_exists($filename)) {
@@ -48,7 +51,9 @@ abstract class AbstractProcessor
         $this->loadImage($filename);
     }
 
-
+    /**
+     * @param array $options
+     */
     protected function setOptions(array $options = array())
     {
         if (array_key_exists('resizeType', $options)) {
@@ -68,6 +73,11 @@ abstract class AbstractProcessor
         }
     }
 
+    /**
+     * @param null $filename
+     * @return $this
+     * @throws ProcessorException
+     */
     protected function loadImage($filename = null)
     {
         $resource = null;
@@ -107,6 +117,7 @@ abstract class AbstractProcessor
      * @param int $width
      * @param int $height
      * @return string
+     * @throws ProcessorException
      */
     protected function getRatio($width = null, $height = null)
     {

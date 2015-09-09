@@ -11,7 +11,7 @@ interface Processor
 
     public function output();
 
-    public function save($filename = null, $quality = 10);
+    public function save($filename = null, $quality = 10, $fileType = IMAGETYPE_JPEG);
 
     /**
      * @param string $filename

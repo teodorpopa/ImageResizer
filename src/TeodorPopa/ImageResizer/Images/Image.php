@@ -2,7 +2,7 @@
 
 namespace TeodorPopa\ImageResizer\Images;
 
-class Image implements ImageInterface
+class Image extends BaseImage implements ImageInterface
 {
 
     public function __construct($filename = null, $options = array())
@@ -20,24 +20,9 @@ class Image implements ImageInterface
         imagealphablending($resource, false);
         imagesavealpha($resource, true);
 
-        return $resource;
+        $this->imageResource = $resource;
+
+        return $this;
     }
-
-    public function output($image)
-    {
-        header("Content-type: image/jpeg");
-
-        imagejpeg($image);
-    }
-
-    public function save($resource = null, $filename = null, $quality = 10)
-    {
-        $compression = $quality * 10;
-
-        imagejpeg($resource, $filename, $compression);
-
-        return true;
-    }
-
 
 }
