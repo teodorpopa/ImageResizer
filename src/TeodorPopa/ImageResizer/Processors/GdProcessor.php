@@ -226,9 +226,20 @@ class GdProcessor extends AbstractProcessor implements Processor
         return (strlen($backgroundColor) == 3) ? sscanf($color, "%1x%1x%1x") : sscanf($color, "%02x%02x%02x");
     }
 
+    /**
+     * Extract the color from the top left corner of the image
+     * 
+     * @return array
+     */
     protected function extractAutoBackgroundColor()
     {
-        return true;
+        $thisColor = imagecolorat($this->loadedImage, 0, 0);
+
+        $red = ($thisColor >> 16) & 0xFF;
+        $green = ($thisColor >> 8) & 0xFF;
+        $blue = $thisColor & 0xFF;
+
+        return [$red, $green, $blue];
     }
 
     /**

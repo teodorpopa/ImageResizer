@@ -80,8 +80,6 @@ abstract class AbstractProcessor
      */
     protected function loadImage($filename = null)
     {
-        $resource = null;
-
         if (empty($filename)) {
             $resource = ImageFactory::factory(null, ['width' => 1, 'height' => 1], 'image');
         } else {
