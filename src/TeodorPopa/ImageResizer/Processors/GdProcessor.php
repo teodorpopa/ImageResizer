@@ -178,36 +178,12 @@ class GdProcessor extends AbstractProcessor implements Processor
         $left = $this->getAxisOffset($width, $newWidth);
         $top = $this->getAxisOffset($height, $newHeight);
 
-        imagecopyresampled(
-            $newImage,
-            $this->loadedImage,
-            $left,
-            $top,
-            0,
-            0,
-            $width,
-            $height,
-            $this->getImageWidth($this->loadedImage),
-            $this->getImageHeight($this->loadedImage)
-        );
+        imagecopyresampled($newImage, $this->loadedImage, $left, $top, 0, 0, $width, $height, $this->getImageWidth($this->loadedImage), $this->getImageHeight($this->loadedImage));
 
         $resizedImage = ImageFactory::factory(null, ['width' => $newWidth, 'height' => $newHeight], 'image');
-
-        imagecopyresampled(
-            $resizedImage,
-            $newImage,
-            0,
-            0,
-            0,
-            0,
-            $newWidth,
-            $newHeight,
-            $newWidth,
-            $newHeight
-        );
+        imagecopyresampled($resizedImage, $newImage, 0, 0, 0, 0, $newWidth, $newHeight, $newWidth, $newHeight);
 
         $this->processedImage = $resizedImage;
-
         return true;
     }
 
