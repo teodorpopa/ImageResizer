@@ -4,7 +4,6 @@ namespace TeodorPopa\ImageResizer\Processors;
 
 use TeodorPopa\ImageResizer\Exceptions\ProcessorException;
 use TeodorPopa\ImageResizer\ImageResizer;
-use TeodorPopa\ImageResizer\Images\Image;
 use TeodorPopa\ImageResizer\Images\ImageFactory;
 
 class GdProcessor extends AbstractProcessor implements Processor
