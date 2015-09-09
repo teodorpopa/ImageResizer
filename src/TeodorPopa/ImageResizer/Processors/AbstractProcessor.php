@@ -74,7 +74,7 @@ abstract class AbstractProcessor
     }
 
     /**
-     * @param null $filename
+     * @param string $filename
      * @return $this
      * @throws ProcessorException
      */
