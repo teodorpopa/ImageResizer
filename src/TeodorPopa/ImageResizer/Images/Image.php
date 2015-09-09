@@ -24,8 +24,6 @@ class Image extends BaseImage implements ImageInterface
         imagesavealpha($resource, true);
 
         $this->imageResource = $resource;
-
-        return $this;
     }
 
 }

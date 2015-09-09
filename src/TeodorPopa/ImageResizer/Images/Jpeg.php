@@ -17,8 +17,6 @@ class Jpeg extends BaseImage implements ImageInterface
         $resource = imagecreatefromjpeg($filename);
 
         $this->imageResource = $resource;
-
-        return $this;
     }
 
 }

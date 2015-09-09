@@ -20,8 +20,6 @@ class Png extends BaseImage implements ImageInterface
         imagesavealpha($resource, true);
 
         $this->imageResource = $resource;
-
-        return $this;
     }
 
 }

@@ -18,8 +18,6 @@ class Gif extends BaseImage implements ImageInterface
         $resource = imagecreatefromgif($filename);
 
         $this->imageResource = $resource;
-
-        return $this;
     }
 
 }
