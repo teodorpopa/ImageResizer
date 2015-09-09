@@ -168,11 +168,9 @@ class GdProcessor extends AbstractProcessor implements Processor
     {
         $newWidth = $dimensions['width'];
         $newHeight = $dimensions['height'];
-
         $newImage = ImageFactory::factory(null, ['width' => $width, 'height' => $height], 'image');
 
-        $backgroundColor = $this->extractBackgroundColor();
-        list($red, $green, $blue) = $backgroundColor;
+        list($red, $green, $blue) = $this->extractBackgroundColor();
 
         $background = imagecolorallocate($newImage, $red, $green, $blue);
         imagefilledrectangle($newImage, 0, 0, $newWidth, $newHeight, $background);
