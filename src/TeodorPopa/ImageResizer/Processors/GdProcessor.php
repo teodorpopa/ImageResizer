@@ -150,13 +150,10 @@ class GdProcessor extends AbstractProcessor implements Processor
         switch ($ratio) {
             case ($ratio < $originalRatio):
                 return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_WIDTH);
-                break;
             case ($ratio > $originalRatio):
                 return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_HEIGHT);
-                break;
             default:
                 return $this->resize($width, $height, ImageResizer::RESIZE_TYPE_EXACT);
-                break;
         }
     }
 
@@ -268,9 +265,10 @@ class GdProcessor extends AbstractProcessor implements Processor
     protected function getXAxisOffset($width, $newWidth)
     {
         $diff = $width - $newWidth;
+        $xOffset = 0;
 
         if ($diff <= 0) {
-            return 0;
+            return $xOffset;
         }
 
         switch ($this->resizePositionX) {
@@ -296,9 +294,10 @@ class GdProcessor extends AbstractProcessor implements Processor
     protected function getYAxisOffset($height, $newHeight)
     {
         $diff = $height - $newHeight;
+        $yOffset = 0;
 
         if ($diff <= 0) {
-            return 0;
+            return $yOffset;
         }
 
         switch ($this->resizePositionX) {
@@ -318,12 +317,12 @@ class GdProcessor extends AbstractProcessor implements Processor
 
     /**
      * @param string $filename
-     * @return array|null
+     * @return string|null
      */
     public function getImageMimeType($filename = null)
     {
         if (empty($filename)) {
-            return false;
+            return null;
         }
 
         $imageInfo = getimagesize($filename);
