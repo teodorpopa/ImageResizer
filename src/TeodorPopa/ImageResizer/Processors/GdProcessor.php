@@ -32,6 +32,10 @@ class GdProcessor extends AbstractProcessor implements Processor
                 $dimensions = $this->getResizeExactDimensions($width, $height);
                 $this->doResize($width, $height, $dimensions);
                 break;
+            case ImageResizer::RESIZE_TYPE_ORIGINAL:
+                $dimensions = $this->getResizeOriginalDimensions();
+                $this->doResize($width, $height, $dimensions);
+                break;
             default:
                 $this->resizeAuto($width, $height);
         }
@@ -135,6 +139,19 @@ class GdProcessor extends AbstractProcessor implements Processor
     }
 
     /**
+     * Return the dimensions array for an original resize
+     *
+     * @return array
+     */
+    public function getResizeOriginalDimensions()
+    {
+        return [
+            'width' => $this->getImageSize($this->loadedImage),
+            'height' => $this->getImageSize($this->loadedImage, 'height')
+        ];
+    }
+
+    /**
      * Resize an image constraining the aspect ratio of the image
      *
      * @param $width
@@ -143,8 +160,15 @@ class GdProcessor extends AbstractProcessor implements Processor
      */
     protected function resizeAuto($width, $height)
     {
+        $imageWidth = $this->getImagesize($this->loadedImage);
+        $imageHeight = $this->getImageSize($this->loadedImage, 'height');
+
+        if($imageWidth < $width && $imageHeight < $height) {
+            return $this->resize($width, $height, ['resizeType' => ImageResizer::RESIZE_TYPE_ORIGINAL]);
+        }
+
         $ratio = $this->getRatio($width, $height);
-        $originalRatio = $this->getRatio($this->getImagesize($this->loadedImage), $this->getImageSize($this->loadedImage, 'height'));
+        $originalRatio = $this->getRatio($imageWidth, $imageHeight);
 
         switch ($ratio) {
             case ($ratio < $originalRatio):

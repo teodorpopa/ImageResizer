@@ -15,6 +15,11 @@ class ImageResizer
     const RESIZE_TYPE_AUTO = 'auto';
 
     /**
+     * Keep the original image size
+     */
+    const RESIZE_TYPE_ORIGINAL = 'original';
+
+    /**
      * Height is automatically calculated based on the width
      */
     const RESIZE_TYPE_WIDTH = 'width';
