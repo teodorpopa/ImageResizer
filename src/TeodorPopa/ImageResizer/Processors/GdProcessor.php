@@ -66,6 +66,18 @@ class GdProcessor extends AbstractProcessor implements Processor
     }
 
     /**
+     * Set the processed image to loaded image
+     * Used to output an unchanged loaded image
+     * 
+     * @return $this
+     */
+    public function process()
+    {
+        $this->processedImage = $this->loadedImage;
+        return $this;
+    }
+
+    /**
      * Saves an image to the specified filename
      *
      * @param null $filename
